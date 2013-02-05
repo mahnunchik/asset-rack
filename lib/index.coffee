@@ -23,6 +23,8 @@ class exports.AssetRack extends EventEmitter
         async.forEach @assets, (asset, next) ->
             asset.on 'complete', ->
                 next()
+            asset.on 'error', (err)->
+                next(err)
             asset.create()
         , (error) =>
             return @emit 'error', error if error?
@@ -121,6 +123,7 @@ class exports.Asset extends EventEmitter
 exports.LessAsset = require('./assets/less').LessAsset
 exports.BrowserifyAsset = require('./assets/browserify').BrowserifyAsset
 exports.JadeAsset = require('./assets/jade').JadeAsset
+exports.BladeAsset = require('./assets/blade').BladeAsset
 exports.StaticAssetRack = require('./assets/static').StaticAssetRack
 exports.StaticAsset = require('./assets/static').StaticAsset
 exports.SnocketsAsset = require('./assets/snockets').SnocketsAsset
