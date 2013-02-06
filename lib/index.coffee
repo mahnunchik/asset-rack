@@ -131,3 +131,4 @@ exports.StaticAssetRack = require('./assets/static').StaticAssetRack
 exports.StaticAsset = require('./assets/static').StaticAsset
 exports.SnocketsAsset = require('./assets/snockets').SnocketsAsset
 exports.AngularTemplatesAsset = require('./assets/angularTemplates').AngularTemplatesAsset
+exports.StaticPackAsset = require('./assets/staticpack').StaticPackAsset
