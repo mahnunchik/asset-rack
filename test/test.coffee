@@ -100,11 +100,11 @@ describe 'StaticPackAsset', ->
           type: 'js'
           compress: true
         asset.create()
-        assert.equal asset.filenames.length, 2
         done()
 
     it 'should be completed', (done)->
       asset.on 'complete', ()->
+        assert.equal asset.filenames.length, 2
         done()
       asset.on 'error', (err)->
         done(err)
@@ -123,11 +123,11 @@ describe 'StaticPackAsset', ->
           url: '/static.css'
           type: 'css'
         asset.create()
-        assert.equal asset.filenames.length, 2
         done()
 
     it 'should be completed', (done)->
       asset.on 'complete', ()->
+        assert.equal asset.filenames.length, 2
         done()
       asset.on 'error', (err)->
         done(err)

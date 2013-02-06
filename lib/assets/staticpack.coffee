@@ -1,5 +1,6 @@
 fs = require 'fs'
-pathutil = require 'path'
+glob = require 'glob'
+async = require 'async'
 uglify = require 'uglify-js'
 cleanCSS = require 'clean-css'
 Asset = require('../index').Asset
@@ -25,31 +26,31 @@ class exports.StaticPackAsset extends Asset
       if @options.basedir?
         @filenames = _.map @filenames, (val)=>
           @options.basedir + val
-    else
-      @filenames = @getFilenames @options.dirname
+
     @compress = @options.compress or false
 
     @contents = ''
-    for file in @filenames
-      @contents += fs.readFileSync(file, 'utf8') + "\n"
+    @getFilenames (err, filenames)=>
+      return @emit('error', err) if err?
+      @filenames = filenames
+      async.map filenames, @getFile, (err, contents)=>
+        return @emit('error', err) if err?
 
-    if @compress
-      if @type == 'css'
-        @contents = cleanCSS.process @contents
-      else
-        @contents = uglify.minify(@contents, { fromString: true }).code if @compress
-    @emit 'complete'
+        for content in contents
+          @contents += content + "\n"
 
-  getFilenames: (dirname) ->
-    filenames = fs.readdirSync dirname
-    paths = []
-    for filename in filenames
-      continue if filename.slice(0, 1) is '.'
-      path = pathutil.join dirname, filename
-      stats = fs.statSync path
-      if stats.isDirectory()
-        paths = paths.concat @getFilenames path
-      else if pathutil.extname(path) == @fileext
-        paths.push(path)
-    paths
+        if @compress
+          if @type == 'css'
+            @contents = cleanCSS.process @contents
+          else
+            @contents = uglify.minify(@contents, { fromString: true }).code if @compress
+        @emit 'complete'
 
+  getFilenames: (cb) ->
+    if @filenames?.length > 0
+      cb(null, @filenames)
+    else
+      glob "#{@dirname}/**/*#{@type}", cb
+
+  getFile: (filename, cb) =>
+    fs.readFile filename, 'utf8', cb
