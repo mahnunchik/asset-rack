@@ -78,9 +78,11 @@ describe 'StaticPackAsset', ->
 
   describe 'Css package', ->
     asset = new rack.StaticPackAsset
+      basedir: "#{__dirname}/fixtures/staticpack/"
       filenames: [
-        "#{__dirname}/fixtures/staticpack/test2.css"
-        "#{__dirname}/fixtures/staticpack/test1.css"
+        "test2.css"
+        "test1.css"
+        "test1.css"
       ]
       url: '/static.css'
       type: 'css'

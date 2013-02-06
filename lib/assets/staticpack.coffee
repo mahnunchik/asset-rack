@@ -3,11 +3,13 @@ pathutil = require 'path'
 uglify = require 'uglify-js'
 cleanCSS = require 'clean-css'
 Asset = require('../index').Asset
+_ = require 'underscore'
 
 class exports.StaticPackAsset extends Asset
   mimetype: ''
 
   create: =>
+    @basedir = @options.basedir
     if @options.type == 'css'
       @type = 'css'
       @fileext = '.css'
@@ -18,7 +20,13 @@ class exports.StaticPackAsset extends Asset
       @mimetype = 'text/javascript'
 
     @dirname = @options.dirname
-    @filenames = if @options.filenames? then @options.filenames else @getFilenames(@options.dirname)
+    if @options.filenames?
+      @filenames = _.unique @options.filenames
+      if @options.basedir?
+        @filenames = _.map @filenames, (val)=>
+          @options.basedir + val
+    else
+      @filenames = @getFilenames @options.dirname
     @compress = @options.compress or false
 
     @contents = ''
