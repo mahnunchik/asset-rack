@@ -61,3 +61,33 @@ describe 'BladeAsset', ->
     asset.on 'error', (err)->
       console.log err
 
+describe 'StaticPackAsset', ->
+  describe 'Js package', ->
+    asset = new rack.StaticPackAsset
+      dirname: "#{__dirname}/fixtures/staticpack"
+      url: '/static.js'
+      type: 'js'
+      compress: true
+    asset.create()
+    assert.equal asset.filenames.length, 2
+
+    asset.on 'complete', ()->
+      console.log 'asset.contents', asset.contents
+    asset.on 'error', (err)->
+      console.log err
+
+  describe 'Css package', ->
+    asset = new rack.StaticPackAsset
+      filenames: [
+        "#{__dirname}/fixtures/staticpack/test2.css"
+        "#{__dirname}/fixtures/staticpack/test1.css"
+      ]
+      url: '/static.css'
+      type: 'css'
+    asset.create()
+    assert.equal asset.filenames.length, 2
+
+    asset.on 'complete', ()->
+      console.log 'asset.contents', asset.contents
+    asset.on 'error', (err)->
+      console.log err
