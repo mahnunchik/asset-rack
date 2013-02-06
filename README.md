@@ -193,6 +193,7 @@ new BrowserifyAsset({
 * `require`: A filename or list of filenames to require, should not be necessary
 as the `filename` argument should pull in any requires you need.
 * `debug` (defaults to false): enables the browserify debug option.
+* `watch` (defaults to false): watch for changes.
 * `compress` (defaults to false): whether to run the javascript through a minifier.
 * `extensionHandlers` (defaults to []): an array of custom extensions and associated handler function. eg: `[{ ext: 'handlebars', handler: handlebarsCompilerFunction }]`
 * `hash` (defaults to true): Set to false if you don't want the md5 sum added to your urls.
@@ -258,6 +259,49 @@ $('body').append(Templates['user/info']());
 * `url`: The url that should retrieve this resource.
 * `dirname`: Directory where template files are located, will grab them recursively.
 * `separator` (defaults to '/'): The character that separates directories, i like to change it to an underscore, `_`.  So that you get more javascript friendly template names like `Templates.user_profile` or `Templates.friends_interests_list`.
+* `compress` (defaults to false): Whether to minify the javascript or not.
+* `clientVariable` (defaults to 'Templates'): Client side template
+variable.
+* `hash` (defaults to true): Set to false if you don't want the md5 sum added to your urls.
+
+## BladeAsset
+This asset concate blade templates. 
+
+```javascript
+new BladeAsset({
+    url: '/templates.js',
+    dirname: __dirname + '/templates'
+});
+```
+
+So if your template directory looked like this:
+
+```
+index.blade
+contact.blade
+user/
+    profile.blade
+    info.blade
+```
+
+Then in the browser, you would first need to include the [blade runtime](https://github.com/bminer/node-blade#browser-usage) script:
+
+```
+script(src="/blade/blade.js", type="text/javascript")
+```
+
+then you could reference your templates like so:
+
+```javascript
+$('body').append(Templates['index']());
+$('body').append(Templates['user/profile']({username: 'brad', status: 'fun'}));
+$('body').append(Templates['user/info']());
+```
+### Options
+
+* `url`: The url that should retrieve this resource.
+* `dirname`: Directory where template files are located, will grab them recursively.
+* `filenames`: (optional) list of templates
 * `compress` (defaults to false): Whether to minify the javascript or not.
 * `clientVariable` (defaults to 'Templates'): Client side template
 variable.
