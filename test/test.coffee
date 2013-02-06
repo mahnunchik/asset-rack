@@ -91,33 +91,77 @@ describe 'BladeAsset', ->
 
 describe 'StaticPackAsset', ->
   describe 'Js package', ->
-    asset = new rack.StaticPackAsset
-      dirname: "#{__dirname}/fixtures/staticpack"
-      url: '/static.js'
-      type: 'js'
-      compress: true
-    asset.create()
-    assert.equal asset.filenames.length, 2
+    asset = null
+    it 'create', (done)->
+      assert.doesNotThrow ()->
+        asset = new rack.StaticPackAsset
+          dirname: "#{__dirname}/fixtures/staticpack"
+          url: '/static.js'
+          type: 'js'
+          compress: true
+        asset.create()
+        assert.equal asset.filenames.length, 2
+        done()
 
-    asset.on 'complete', ()->
-      console.log 'asset.contents', asset.contents
-    asset.on 'error', (err)->
-      console.log err
+    it 'should be completed', (done)->
+      asset.on 'complete', ()->
+        done()
+      asset.on 'error', (err)->
+        done(err)
 
   describe 'Css package', ->
-    asset = new rack.StaticPackAsset
-      basedir: "#{__dirname}/fixtures/staticpack/"
-      filenames: [
-        "test2.css"
-        "test1.css"
-        "test1.css"
-      ]
-      url: '/static.css'
-      type: 'css'
-    asset.create()
-    assert.equal asset.filenames.length, 2
+    asset = null
+    it 'create', (done)->
+      assert.doesNotThrow ()->
+        asset = new rack.StaticPackAsset
+          basedir: "#{__dirname}/fixtures/staticpack/"
+          filenames: [
+            "test2.css"
+            "test1.css"
+            "test1.css"
+          ]
+          url: '/static.css'
+          type: 'css'
+        asset.create()
+        assert.equal asset.filenames.length, 2
+        done()
 
-    asset.on 'complete', ()->
-      console.log 'asset.contents', asset.contents
-    asset.on 'error', (err)->
-      console.log err
+    it 'should be completed', (done)->
+      asset.on 'complete', ()->
+        done()
+      asset.on 'error', (err)->
+        done(err)
+
+
+describe 'BrowserifyAsset', ->
+  describe '#constructor', ->
+    asset = null
+    it 'create', (done)->
+      assert.doesNotThrow ()->
+        asset = new rack.BrowserifyAsset
+          filename: "#{__dirname}/fixtures/coffeescript/main.coffee"
+          url: '/main.js'
+          watch: true
+          debug: true
+        asset.create()
+        done()
+    
+    it 'should be completed', (done)->
+      asset.on 'complete', ()->
+        assert.notEqual asset.contents, null
+        assert.notEqual asset.specificUrl, null
+        done()
+      asset.once 'error', (err)->
+        asset.removeAllListeners()
+        done(err)
+
+    it 'should emit error', (done)->
+      asset = new rack.BrowserifyAsset
+        filename: "#{__dirname}/fixtures/coffeescript/error.coffee"
+        url: '/main.js'
+        watch: true
+        debug: true
+      asset.on 'error', (err)->
+        assert.notEqual err, null
+        done()
+      asset.create()
