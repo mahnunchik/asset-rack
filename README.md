@@ -265,7 +265,7 @@ variable.
 * `hash` (defaults to true): Set to false if you don't want the md5 sum added to your urls.
 
 ## BladeAsset
-This asset concate blade templates. 
+This asset concatenate blade templates. 
 
 ```javascript
 new BladeAsset({
