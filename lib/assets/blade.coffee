@@ -1,5 +1,5 @@
 
-fs = require 'fs'
+glob = require 'glob'
 pathutil = require 'path'
 uglify = require 'uglify-js'
 async = require 'async'
@@ -12,32 +12,26 @@ class exports.BladeAsset extends Asset
 
   create: =>
     @dirname = @options.dirname
-    @filenames = if @options.filenames? then @options.filenames else @getFilenames(@options.dirname)
-    @separator = @options.separator or '/'
+    @filenames = @options.filenames
     @compress = @options.compress or false
     @clientVariable = @options.clientVariable or 'Templates'
-    
-    async.map @filenames, @compile, (err, tmpls)=>
-      @emit('error', err) if err?
-      @contents = "window.#{@clientVariable} = {"
-      for tmpl in tmpls
-        @contents += "'#{tmpl.filename}': #{tmpl.toString()},"
-      @contents += '};'
-      @contents = uglify.minify(@contents, { fromString: true }).code if @compress
-      @emit 'complete'
-    
-  getFilenames: (dirname) ->
-    filenames = fs.readdirSync dirname
-    paths = []
-    for filename in filenames
-      continue if filename.slice(0, 1) is '.'
-      path = pathutil.join dirname, filename
-      stats = fs.statSync path
-      if stats.isDirectory()
-        paths = paths.concat @getFilenames path
-      else if pathutil.extname(path) == '.blade'
-        paths.push(path)
-    paths
+
+    @getFilenames (err, filenames)=> 
+      return @emit('error', err) if err?
+      async.map filenames, @compile, (err, tmpls)=>
+        return @emit('error', err) if err?
+        @contents = "window.#{@clientVariable} = {"
+        for tmpl in tmpls
+          @contents += "'#{tmpl.filename}': #{tmpl.toString()},"
+        @contents += '};'
+        @contents = uglify.minify(@contents, { fromString: true }).code if @compress
+        @emit 'complete'
+  
+  getFilenames: (cb) ->
+    if @filenames?.length > 0
+      cb(null, @filenames)
+    else
+      glob "#{@dirname}/**/*.blade", cb
 
   compile: (filename, cb)=>
     options = 
