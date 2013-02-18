@@ -21,8 +21,8 @@ class exports.BrowserifyAsset extends Asset
       @emit 'error', err
     for handler in @extensionHandlers
       agent.register(handler.ext, handler.handler)
-    agent.addEntry @filename
-    agent.require @require if @require
+    agent.addEntry @filename if @filename?
+    agent.require @require if @require?
     
 
     @setContents(agent.bundle())
